@@ -13,70 +13,58 @@ class WelcomePhotoViewController < UIViewController
 
     self.view.layer.addSublayer(background_gradient)
 
-    @current_step = UILabel.alloc.initWithFrame(CGRectZero)
+    @current_step = UILabel.alloc.initWithFrame([[0, 0], [300, 30]])
     @current_step.text = "Step 2 of 2"
     @current_step.numberOfLines = 0
     @current_step.font = UIFont.fontWithName("Marker Felt", size:20)
-    @current_step.sizeToFit
-    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.3)
+    @current_step.textAlignment = UITextAlignmentCenter
+    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.4)
     @current_step.backgroundColor = UIColor.clearColor
     @current_step.center = [self.view.center.x, 30]
-
     self.view.addSubview(@current_step)
 
-    @photo_container = UIView.alloc.initWithFrame([[0,0], [200, 200]])
+    @photo_container = UIButton.buttonWithType(UIButtonTypeCustom)
+    @photo_container.frame = [[0,0], [200, 200]]
     @photo_container.center = [self.view.center.x, self.view.center.y - 20]
     @photo_container.backgroundColor = UIColor.colorWithWhite(0.2, alpha:1)
     @photo_container.layer.cornerRadius = 10
     @photo_container.layer.borderWidth = 1;
     @photo_container.layer.borderColor = UIColor.blackColor.CGColor;
     @photo_container.clipsToBounds = true
-
-    # add container view
     self.view.addSubview(@photo_container)
 
-    @name_label = UILabel.alloc.initWithFrame([[0, 0], [300, 32]])
-    @name_label.text = "What do you look like?"
-    @name_label.numberOfLines = 0
-    @name_label.textAlignment = UITextAlignmentCenter
-    @name_label.font = UIFont.fontWithName("Marker Felt", size:24)    
-    @name_label.backgroundColor = UIColor.clearColor
-    @name_label.textColor = UIColor.whiteColor
+    @label = UILabel.alloc.initWithFrame([[0, 0], [300, 32]])
+    @label.text = "What do you look like?"
+    @label.numberOfLines = 0
+    @label.textAlignment = UITextAlignmentCenter
+    @label.font = UIFont.fontWithName("Marker Felt", size:24)    
+    @label.backgroundColor = UIColor.clearColor
+    @label.textColor = UIColor.whiteColor
+    @label.center = [self.view.center.x.floor, @photo_container.origin.y.floor - 24]
+    self.view.addSubview(@label)
     
-    # add to container
-    self.view.addSubview(@name_label)
 
-    @name_label.center = [self.view.center.x.floor, @photo_container.origin.y.floor - 24]
-
-    @choose_photo_button = self.buildBlueButton('Choose from Camera Roll')
-    @choose_photo_button.center = [self.view.center.x.floor, @photo_container.origin.y + @photo_container.size.height + 30]
-    
     @photo_container.when UIControlEventTouchUpInside do
-      BW::Device.camera.any.picture(media_types: [:image]) do |result|
-        setUserImage(result)
-      end
-    end
-
-    self.view.addSubview(@choose_photo_button)
-
-    if BW::Device.camera.front?
-      @take_photo_button = self.buildBlueButton('Take a Photo')
-      @take_photo_button.center = [@take_photo_button.center.x, @choose_photo_button.center.y + @choose_photo_button.size.height + 10]
-      @take_photo_button.addTarget(self, action: "takePhotoTouched", forControlEvents: UIControlEventTouchUpInside)
-
-      self.view.addSubview(@take_photo_button)
+      # if we have a front camera, then show an action sheet
+      self.showPhotoActionSheet
+      # if BW::Device.camera.front?
+      #   self.showPhotoActionSheet
+      # else
+      #   self.choosePhotoTouched
+      # end
     end
 
     # # Add view for the next button
     # @next_container = self.buildNextButtonContainer
-    
-    # self.view.addSubview @next_container
+    # self.view.addSubview(@next_container)
 
-    # @next_button = self.buildNextButton("Next")
+    # @next_container.hidden = true
+
+    # @next_button = self.buildNextButton("Finish!")
     # @next_button.center = CGPointMake(@next_container.bounds.size.width / 2, @next_container.bounds.size.height / 2)
     # @next_button.addTarget(self, action: "nextTouched", forControlEvents: UIControlEventTouchUpInside)
     
-    # @next_container.addSubview @next_button
+    # @next_container.addSubview(@next_button)
   end
 
   def buildNextButtonContainer
@@ -122,6 +110,25 @@ class WelcomePhotoViewController < UIViewController
     image_view.center = [100, 100]
   end
 
+  def showPhotoActionSheet
+    photo_sheet = UIActionSheet.alloc.initWithTitle(nil, delegate:self, cancelButtonTitle:"Cancel", destructiveButtonTitle:nil, otherButtonTitles:"Choose from Library","Take a Photo",nil)
+    photo_sheet.showInView(self.view)
+  end
+
+  def actionSheet(actionSheet, didDismissWithButtonIndex:button_index)
+    puts "A button was tapped, #{button_index}"
+    
+    case button_index
+    when 0
+      puts "Choose from Library"
+      self.choosePhotoTouched
+    when 1
+      puts "Take a Photo"
+    when 2
+      puts "Cancel"
+    end
+  end
+
   def takePhotoTouched
     puts "Take a photo."
 
@@ -139,27 +146,10 @@ class WelcomePhotoViewController < UIViewController
     # end
   end
 
-  def imagePickerController(picker, didFinishPickingMediaWithInfo:info)
-    puts "Picker returned successfully"
-    mediaType = info.objectForKey(UIImagePickerControllerMediaType)
-
-    if mediaType.isEqualToString(KUTTypeMovie)
-      video_url = info.objectForKey(UIImagePickerControllerMediaURL)
-      puts "Video located at #{video_url}"
-    elsif mediaType.isEqualToString(KUTTypeImage)
-      metadata = info.objectForKey(UIImagePickerControllerMediaMetadata)
-      the_image = info.objectForKey(UIImagePickerControllerOriginalImage)
-
-      puts "Image Metadata = #{metadata}"
-      puts "Image = #{the_image}"
+  def choosePhotoTouched
+    BW::Device.camera.any.picture(media_types: [:image]) do |result|
+      setUserImage(result)
     end
-
-    picker.dismissModalViewControllerAnimated(true)
-  end
-
-  def imagePickerControllerDidCancel(picker)
-    puts = "Picker was cancelled"
-    picker.dismissModalViewControllerAnimated(true)
   end
 
 end

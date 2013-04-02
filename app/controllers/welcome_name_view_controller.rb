@@ -13,15 +13,14 @@ class WelcomeNameViewController < UIViewController
 
     self.view.layer.addSublayer(background_gradient)
 
-    @current_step = UILabel.alloc.initWithFrame(CGRectZero)
+    @current_step = UILabel.alloc.initWithFrame([[0, 0], [300, 30]])
     @current_step.text = "Step 1 of 2"
     @current_step.numberOfLines = 0
     @current_step.font = UIFont.fontWithName("Marker Felt", size:20)
-    @current_step.sizeToFit
-    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.3)
+    @current_step.textAlignment = UITextAlignmentCenter
+    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.4)
     @current_step.backgroundColor = UIColor.clearColor
     @current_step.center = [self.view.center.x, 30]
-
     self.view.addSubview(@current_step)
 
     @upper_container = UIView.alloc.initWithFrame([[0,0], [300, 170]])
@@ -51,20 +50,17 @@ class WelcomeNameViewController < UIViewController
     @keyboard_observer_visible = App.notification_center.addObserver(self, selector:'handleKeyboardVisible:', name:UIKeyboardDidShowNotification, object:nil)
     @keyboard_observer_hidden = App.notification_center.addObserver(self, selector:'handleKeyboardHidden:', name:UIKeyboardWillHideNotification, object:nil)
 
-    @name_label = UILabel.alloc.initWithFrame(CGRectZero)
-    @name_label.text = "What's your name?"
-    @name_label.numberOfLines = 0
-    @name_label.font = UIFont.fontWithName("Marker Felt", size:20)
-    @name_label.sizeToFit
-    
-    # Position label above the text field
-    @name_label.center = [@text_field.center.x, @text_field.center.y - @name_label.size.height - 16]
-
-    @name_label.backgroundColor = UIColor.clearColor
-    @name_label.textColor = UIColor.whiteColor
+    @label = UILabel.alloc.initWithFrame([[0, 0], [300, 32]])
+    @label.text = "What's your name?"
+    @label.numberOfLines = 0
+    @label.textAlignment = UITextAlignmentCenter
+    @label.font = UIFont.fontWithName("Marker Felt", size:24)    
+    @label.backgroundColor = UIColor.clearColor
+    @label.textColor = UIColor.whiteColor
+    @label.center = [@text_field.center.x, @text_field.center.y - @label.size.height - 16]
     
     # add to container
-    @upper_container.addSubview @name_label
+    @upper_container.addSubview(@label)
 
     # Add view for the next button
     @next_container = self.buildNextButtonContainer
