@@ -45,13 +45,11 @@ class WelcomePhotoViewController < UIViewController
     
 
     @photo_container.when UIControlEventTouchUpInside do
-      # if we have a front camera, then show an action sheet
-      self.showPhotoActionSheet
-      # if BW::Device.camera.front?
-      #   self.showPhotoActionSheet
-      # else
-      #   self.choosePhotoTouched
-      # end
+      if BW::Device.camera.front?
+        self.showPhotoActionSheet
+      else
+        self.choosePhotoTouched
+      end
     end
 
     # Add view for the next button
@@ -101,21 +99,6 @@ class WelcomePhotoViewController < UIViewController
     @next_container.hidden = false
   end
 
-  def setUserImage(result)
-    puts "Setting user image."
-    puts result
-
-    image_view = UIImageView.alloc.initWithImage(result[:original_image])
-    image_view.layer.cornerRadius = 11
-
-    @photo_container.subviews.each { |v| v.removeFromSuperview }
-
-    @photo_container.addSubview image_view
-    image_view.center = [100, 100]
-
-    self.showNextButton
-  end
-
   def showPhotoActionSheet
     photo_sheet = UIActionSheet.alloc.initWithTitle(nil, delegate:self, cancelButtonTitle:"Cancel", destructiveButtonTitle:nil, otherButtonTitles:"Choose from Library","Take a Photo",nil)
     photo_sheet.showInView(self.view)
@@ -151,9 +134,30 @@ class WelcomePhotoViewController < UIViewController
   end
 
   def choosePhotoTouched
-    BW::Device.camera.any.picture(media_types: [:image]) do |result|
+    BW::Device.camera.any.picture(media_types:[:image], allows_editing:true) do |result|
       setUserImage(result)
     end
+  end
+
+  def setUserImage(result)
+    puts "Setting user image."
+    puts result
+
+    the_image = if result.has_key?(:edited_image)
+      result[:edited_image]
+    else
+      result[:original_image]
+    end
+
+    image_view = UIImageView.alloc.initWithImage(the_image)
+    image_view.layer.cornerRadius = 11
+
+    @photo_container.subviews.each { |v| v.removeFromSuperview }
+
+    @photo_container.addSubview image_view
+    image_view.center = [100, 100]
+
+    self.showNextButton
   end
 
   def finishTouched
