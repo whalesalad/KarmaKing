@@ -4,6 +4,7 @@ class KKButton < UIButton
     KKButton.buttonWithType(UIButtonTypeCustom)
   end
 
+  # Orange Button
   # [UIColor colorWithRed:1.000 green:0.761 blue:0.000 alpha:1.000]
   # [UIColor colorWithRed:1.000 green:0.502 blue:0.000 alpha:1.000]
 
@@ -25,15 +26,17 @@ class KKButton < UIButton
     self
   end
 
-  def drawGradientLayer
-    @gradient = CAGradientLayer.layer
-    @gradient.frame = self.bounds
-    
-    @gradient.colors = [
+  def gradientColors
+    [
       UIColor.colorWithRed(1.000, green:0.761, blue:0.000, alpha:1.000).CGColor,
       UIColor.colorWithRed(1.000, green:0.502, blue:0.000, alpha:1.000).CGColor
     ]
+  end
 
+  def drawGradientLayer
+    @gradient = CAGradientLayer.layer
+    @gradient.frame = self.bounds
+    @gradient.colors = self.gradientColors
     @gradient.cornerRadius = 11
 
     self.layer.addSublayer(@gradient)
@@ -92,7 +95,14 @@ class KKButton < UIButton
 
     @gradient.frame = self.bounds
 
+    self.resizeTitleLabel
+
     self.setNeedsDisplay
+  end
+
+  def resizeTitleLabel
+    new_size = ((self.size.height * 0.5) - 2).floor
+    self.titleLabel.font = UIFont.fontWithName("HelveticaNeue-Bold", size:new_size)
   end
 
   def highlighted=(highlighted)

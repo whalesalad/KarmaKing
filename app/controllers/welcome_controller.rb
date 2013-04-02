@@ -15,13 +15,13 @@ class WelcomeController < UIViewController
     @welcome_label = UILabel.alloc.initWithFrame(CGRectZero)
     @welcome_label.text = "Welcome to\nKarmaKing"
     @welcome_label.numberOfLines = 2
-    @welcome_label.font = UIFont.fontWithName("Marker Felt", size:20)
+    @welcome_label.font = UIFont.fontWithName("Marker Felt", size:24)
     @welcome_label.sizeToFit
     @welcome_label.center = self.view.center
     @welcome_label.backgroundColor = UIColor.clearColor
     @welcome_label.textColor = UIColor.whiteColor
     
-    self.view.addSubview @welcome_label
+    self.view.addSubview(@welcome_label)
 
     @start_button = KKButton.alloc.init
     @start_button.frame = [[20, self.view.frame.size.height * 0.75], [280, 80]]
@@ -29,7 +29,7 @@ class WelcomeController < UIViewController
 
     @start_button.addTarget(self, action: "getStartedTouched", forControlEvents: UIControlEventTouchUpInside)
     
-    self.view.addSubview @start_button
+    self.view.addSubview(@start_button)
   end
 
   def getStartedTouched

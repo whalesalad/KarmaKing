@@ -13,8 +13,19 @@ class WelcomeNameViewController < UIViewController
 
     self.view.layer.addSublayer(background_gradient)
 
-    @upper_container = UIView.alloc.initWithFrame([[0,0], [300, 200]])
-    @upper_container.center = self.view.center
+    @current_step = UILabel.alloc.initWithFrame(CGRectZero)
+    @current_step.text = "Step 1 of 2"
+    @current_step.numberOfLines = 0
+    @current_step.font = UIFont.fontWithName("Marker Felt", size:20)
+    @current_step.sizeToFit
+    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.3)
+    @current_step.backgroundColor = UIColor.clearColor
+    @current_step.center = [self.view.center.x, 30]
+
+    self.view.addSubview(@current_step)
+
+    @upper_container = UIView.alloc.initWithFrame([[0,0], [300, 170]])
+    @upper_container.center = [self.view.center.x, self.view.center.y]
 
     # add container view
     self.view.addSubview @upper_container
@@ -25,9 +36,12 @@ class WelcomeNameViewController < UIViewController
     @text_field.autocapitalizationType = UITextAutocapitalizationTypeWords
     @text_field.borderStyle = UITextBorderStyleRoundedRect
 
-    @upper_container.addSubview @text_field
+    # Set the text to the user's current name
+    @text_field.text = App::Persistence['user_name']
 
-    @text_field.center = CGPointMake(@upper_container.size.width/2, @upper_container.size.height/2)
+    @upper_container.addSubview(@text_field)
+
+    @text_field.center = CGPointMake(@upper_container.size.width/2, @upper_container.size.height/2 - @text_field.size.height/2)
 
     # @text_field.becomeFirstResponder
     @text_field.setReturnKeyType(UIReturnKeyDone)
@@ -81,7 +95,6 @@ class WelcomeNameViewController < UIViewController
   end
 
   def buildNextButton(title)
-    # button = UIButton.buttonWithType(UIButtonTypeRoundedRect)
     button = KKButton.alloc.init
     button.frame = [[0, 0], [280, 50]]
     button.setTitle(title, forState: UIControlStateNormal)
@@ -124,7 +137,12 @@ class WelcomeNameViewController < UIViewController
   end
 
   def nextTouched
-    puts "NEXT!!!!!"
+    App::Persistence['user_name'] = @text_field.text
+
+    photo_controller = WelcomePhotoViewController.alloc.initWithNibName(nil, bundle: nil)
+    self.navigationController.pushViewController(photo_controller, animated: true)
+
+    # puts "NEXT!!!!! Name: #{@text_field.text}"
   end
 
   def viewWillDisappear(animated)

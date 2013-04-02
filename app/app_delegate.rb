@@ -4,9 +4,16 @@ class AppDelegate
 
     @window.makeKeyAndVisible
 
-    @welcome_controller = WelcomeController.alloc.initWithNibName(nil, bundle: nil)
-    @nav_controller = UINavigationController.alloc.initWithRootViewController(@welcome_controller)
+    new_user = App::Persistence['user_uuid'].nil?
 
+    if new_user
+      # App::Persistence['user_uuid'] = BubbleWrap.create_uuid
+      @root_controller = WelcomeController.alloc.initWithNibName(nil, bundle: nil)
+    else
+      # @root_controller = 
+    end
+
+    @nav_controller = UINavigationController.alloc.initWithRootViewController(@root_controller)
     @nav_controller.navigationBarHidden = true
 
     @window.rootViewController = @nav_controller
