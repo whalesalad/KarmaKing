@@ -48,15 +48,24 @@ class WelcomePhotoViewController < UIViewController
 
     @name_label.center = [self.view.center.x.floor, @photo_container.origin.y.floor - 24]
 
-    # KKBlueButton
-    @take_photo_button = self.buildBlueButton('Take a Photo')
     @choose_photo_button = self.buildBlueButton('Choose from Camera Roll')
+    @choose_photo_button.center = [self.view.center.x.floor, @photo_container.origin.y + @photo_container.size.height + 30]
+    
+    @photo_container.when UIControlEventTouchUpInside do
+      BW::Device.camera.any.picture(media_types: [:image]) do |result|
+        setUserImage(result)
+      end
+    end
 
-    @take_photo_button.center = [self.view.center.x.floor, @photo_container.origin.y + @photo_container.size.height + 30]
-    self.view.addSubview(@take_photo_button)
-
-    @choose_photo_button.center = [@take_photo_button.center.x, @take_photo_button.center.y + @take_photo_button.size.height + 10]
     self.view.addSubview(@choose_photo_button)
+
+    if BW::Device.camera.front?
+      @take_photo_button = self.buildBlueButton('Take a Photo')
+      @take_photo_button.center = [@take_photo_button.center.x, @choose_photo_button.center.y + @choose_photo_button.size.height + 10]
+      @take_photo_button.addTarget(self, action: "takePhotoTouched", forControlEvents: UIControlEventTouchUpInside)
+
+      self.view.addSubview(@take_photo_button)
+    end
 
     # # Add view for the next button
     # @next_container = self.buildNextButtonContainer
@@ -100,9 +109,57 @@ class WelcomePhotoViewController < UIViewController
     return button
   end
 
-  def nextTouched
-    App::Persistence['user_name'] = @text_field.text
-    # puts "NEXT!!!!! Name: #{@text_field.text}"
+  def setUserImage(result)
+    puts "Setting user image."
+    puts result
+
+    image_view = UIImageView.alloc.initWithImage(result[:original_image])
+    image_view.layer.cornerRadius = 11
+
+    @photo_container.subviews.each { |v| v.removeFromSuperview }
+
+    @photo_container.addSubview image_view
+    image_view.center = [100, 100]
+  end
+
+  def takePhotoTouched
+    puts "Take a photo."
+
+    controller = UIImagePickerController.alloc.init
+    controller.sourceType = UIImagePickerControllerSourceTypeCamera
+
+    requiredMediaType = KUTTypeImage
+    controller.mediaTypes = [requiredMediaType]
+    controller.allowsEditing = true
+    controller.delegate = self
+
+    self.navigationController.presentModalViewController(controller, animated:true)
+    # BW::Device.camera.front.picture(media_types: [:image]) do |result|
+    #   image_view = UIImageView.alloc.initWithImage(result[:original_image])
+    # end
+  end
+
+  def imagePickerController(picker, didFinishPickingMediaWithInfo:info)
+    puts "Picker returned successfully"
+    mediaType = info.objectForKey(UIImagePickerControllerMediaType)
+
+    if mediaType.isEqualToString(KUTTypeMovie)
+      video_url = info.objectForKey(UIImagePickerControllerMediaURL)
+      puts "Video located at #{video_url}"
+    elsif mediaType.isEqualToString(KUTTypeImage)
+      metadata = info.objectForKey(UIImagePickerControllerMediaMetadata)
+      the_image = info.objectForKey(UIImagePickerControllerOriginalImage)
+
+      puts "Image Metadata = #{metadata}"
+      puts "Image = #{the_image}"
+    end
+
+    picker.dismissModalViewControllerAnimated(true)
+  end
+
+  def imagePickerControllerDidCancel(picker)
+    puts = "Picker was cancelled"
+    picker.dismissModalViewControllerAnimated(true)
   end
 
 end
