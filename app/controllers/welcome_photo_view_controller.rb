@@ -54,17 +54,17 @@ class WelcomePhotoViewController < UIViewController
       # end
     end
 
-    # # Add view for the next button
-    # @next_container = self.buildNextButtonContainer
-    # self.view.addSubview(@next_container)
+    # Add view for the next button
+    @next_container = self.buildNextButtonContainer
+    self.view.addSubview(@next_container)
 
-    # @next_container.hidden = true
+    @next_container.hidden = true
 
-    # @next_button = self.buildNextButton("Finish!")
-    # @next_button.center = CGPointMake(@next_container.bounds.size.width / 2, @next_container.bounds.size.height / 2)
-    # @next_button.addTarget(self, action: "nextTouched", forControlEvents: UIControlEventTouchUpInside)
+    @next_button = self.buildNextButton("Finish!")
+    @next_button.center = CGPointMake(@next_container.bounds.size.width / 2, @next_container.bounds.size.height / 2)
+    @next_button.addTarget(self, action:"finishTouched", forControlEvents:UIControlEventTouchUpInside)
     
-    # @next_container.addSubview(@next_button)
+    @next_container.addSubview(@next_button)
   end
 
   def buildNextButtonContainer
@@ -97,6 +97,10 @@ class WelcomePhotoViewController < UIViewController
     return button
   end
 
+  def showNextButton
+    @next_container.hidden = false
+  end
+
   def setUserImage(result)
     puts "Setting user image."
     puts result
@@ -108,6 +112,8 @@ class WelcomePhotoViewController < UIViewController
 
     @photo_container.addSubview image_view
     image_view.center = [100, 100]
+
+    self.showNextButton
   end
 
   def showPhotoActionSheet
@@ -124,19 +130,17 @@ class WelcomePhotoViewController < UIViewController
       self.choosePhotoTouched
     when 1
       puts "Take a Photo"
+      self.takePhotoTouched
     when 2
       puts "Cancel"
     end
   end
 
   def takePhotoTouched
-    puts "Take a photo."
-
     controller = UIImagePickerController.alloc.init
     controller.sourceType = UIImagePickerControllerSourceTypeCamera
 
-    requiredMediaType = KUTTypeImage
-    controller.mediaTypes = [requiredMediaType]
+    controller.mediaTypes = [KUTTypeImage]
     controller.allowsEditing = true
     controller.delegate = self
 
@@ -150,6 +154,10 @@ class WelcomePhotoViewController < UIViewController
     BW::Device.camera.any.picture(media_types: [:image]) do |result|
       setUserImage(result)
     end
+  end
+
+  def finishTouched
+    puts "We're all done here."
   end
 
 end
