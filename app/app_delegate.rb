@@ -7,14 +7,21 @@ class AppDelegate
     Parse.setApplicationId("EUrTZ8F8j53ankiunZgLBfuNjmmApgcf0hu3k5ax", 
       clientKey:"oN6d9KEJT9ppKSgtfKEhpnzOvAGzT6rPpMpsjlm6")
 
-    new_user = App::Persistence['user_uuid'].nil?
+    current_user = PFUser.currentUser
 
-    if new_user
-      # App::Persistence['user_uuid'] = BubbleWrap.create_uuid
-      @root_controller = WelcomeController.alloc.initWithNibName(nil, bundle: nil)
+    if current_user
+      puts current_user.objectForKey "name"
+      current_user.incrementKey("runCount")
     else
-      # @root_controller = 
+      puts "No user found, enabling auto user."
+      PFUser.enableAutomaticUser
     end
+
+    finished_onboarding = !!current_user.objectForKey("onboardingComplete")
+    # finished_onboarding = true
+
+    _root = (finished_onboarding) ? HomeViewController : WelcomeViewController
+    @root_controller = _root.alloc.initWithNibName(nil, bundle: nil)
 
     @nav_controller = UINavigationController.alloc.initWithRootViewController(@root_controller)
     @nav_controller.navigationBarHidden = true

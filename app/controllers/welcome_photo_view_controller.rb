@@ -143,13 +143,13 @@ class WelcomePhotoViewController < UIViewController
     puts "Setting user image."
     puts result
 
-    the_image = if result.has_key?(:edited_image)
+    @the_image = if result.has_key?(:edited_image)
       result[:edited_image]
     else
       result[:original_image]
     end
 
-    image_view = UIImageView.alloc.initWithImage(the_image)
+    image_view = UIImageView.alloc.initWithImage(@the_image)
     image_view.layer.cornerRadius = 11
 
     @photo_container.subviews.each { |v| v.removeFromSuperview }
@@ -163,7 +163,21 @@ class WelcomePhotoViewController < UIViewController
   end
 
   def finishTouched
-    puts "We're all done here."
+    image_data = UIImagePNGRepresentation(@the_image)
+    image_file = PFFile.fileWithName("image.png", data:image_data)
+    image_file.saveInBackground
+    
+    current_user = PFUser.currentUser
+    current_user.setObject(image_file, forKey:"photo")
+
+    # Set onboarding to complete, since welcome tour is done
+    current_user.setObject(true, forKey:"onboardingComplete")
+
+    # Save user
+    current_user.saveInBackground
+
+    home = HomeViewController.alloc.initWithNibName(nil, bundle: nil)
+    self.navigationController.pushViewController(home, animated: true)
   end
 
 end

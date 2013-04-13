@@ -135,10 +135,11 @@ class WelcomeNameViewController < UIViewController
   def nextTouched
     App::Persistence['user_name'] = @text_field.text
 
+    PFUser.currentUser.setObject @text_field.text, forKey: "name"
+    PFUser.currentUser.saveInBackground
+
     photo_controller = WelcomePhotoViewController.alloc.initWithNibName(nil, bundle: nil)
     self.navigationController.pushViewController(photo_controller, animated: true)
-
-    # puts "NEXT!!!!! Name: #{@text_field.text}"
   end
 
   def viewWillDisappear(animated)
