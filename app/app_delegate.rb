@@ -4,6 +4,9 @@ class AppDelegate
 
     @window.makeKeyAndVisible
 
+    Parse.setApplicationId("EUrTZ8F8j53ankiunZgLBfuNjmmApgcf0hu3k5ax", 
+      clientKey:"oN6d9KEJT9ppKSgtfKEhpnzOvAGzT6rPpMpsjlm6")
+
     new_user = App::Persistence['user_uuid'].nil?
 
     if new_user

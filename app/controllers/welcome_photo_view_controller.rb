@@ -155,7 +155,9 @@ class WelcomePhotoViewController < UIViewController
     @photo_container.subviews.each { |v| v.removeFromSuperview }
 
     @photo_container.addSubview image_view
-    image_view.center = [100, 100]
+
+    # Set frame of the photo to the container bounds, so it's 200x200
+    image_view.frame = @photo_container.bounds
 
     self.showNextButton
   end
