@@ -20,7 +20,7 @@ class AppDelegate
     finished_onboarding = !!current_user.objectForKey("onboardingComplete")
     # finished_onboarding = true
 
-    _root = (finished_onboarding) ? HomeViewController : WelcomeViewController
+    _root = (finished_onboarding) ? KKHomeViewController : KKWelcomeViewController
     @root_controller = _root.alloc.initWithNibName(nil, bundle: nil)
 
     @nav_controller = UINavigationController.alloc.initWithRootViewController(@root_controller)

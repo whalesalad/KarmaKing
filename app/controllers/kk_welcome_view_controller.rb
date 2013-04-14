@@ -33,7 +33,7 @@ class WelcomeViewController < UIViewController
   end
 
   def getStartedTouched
-    name_controller = WelcomeNameViewController.alloc.initWithNibName(nil, bundle: nil)
+    name_controller = KKWelcomeNameViewController.alloc.initWithStep(1)
     self.navigationController.pushViewController(name_controller, animated: true)
   end
 

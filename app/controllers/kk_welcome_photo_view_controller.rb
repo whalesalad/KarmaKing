@@ -1,27 +1,7 @@
-class WelcomePhotoViewController < UIViewController
+class KKWelcomePhotoViewController < KKWelcomeViewControllerBase
 
   def viewDidLoad
     super
-
-    background_gradient = CAGradientLayer.layer
-    background_gradient.frame = view.bounds
-    
-    background_gradient.colors = [
-      UIColor.blackColor.CGColor, 
-      UIColor.colorWithRed(70/255.0, green: 70/255.0, blue: 88/255.0, alpha:1.0).CGColor
-    ]
-
-    self.view.layer.addSublayer(background_gradient)
-
-    @current_step = UILabel.alloc.initWithFrame([[0, 0], [300, 30]])
-    @current_step.text = "Step 2 of 2"
-    @current_step.numberOfLines = 0
-    @current_step.font = UIFont.fontWithName("Marker Felt", size:20)
-    @current_step.textAlignment = UITextAlignmentCenter
-    @current_step.textColor = UIColor.colorWithWhite(1, alpha:0.4)
-    @current_step.backgroundColor = UIColor.clearColor
-    @current_step.center = [self.view.center.x, 30]
-    self.view.addSubview(@current_step)
 
     @photo_container = UIButton.buttonWithType(UIButtonTypeCustom)
     @photo_container.frame = [[0,0], [200, 200]]
@@ -42,7 +22,6 @@ class WelcomePhotoViewController < UIViewController
     @label.textColor = UIColor.whiteColor
     @label.center = [self.view.center.x.floor, @photo_container.origin.y.floor - 24]
     self.view.addSubview(@label)
-    
 
     @photo_container.when UIControlEventTouchUpInside do
       if BW::Device.camera.front?
@@ -63,36 +42,6 @@ class WelcomePhotoViewController < UIViewController
     @next_button.addTarget(self, action:"finishTouched", forControlEvents:UIControlEventTouchUpInside)
     
     @next_container.addSubview(@next_button)
-  end
-
-  def buildNextButtonContainer
-    next_container = UIView.alloc.initWithFrame([[0, self.view.size.height - 90], [self.view.size.width, 90]])
-
-    gradient = CAGradientLayer.layer
-    gradient.frame = next_container.bounds
-    
-    gradient.colors = [
-      UIColor.colorWithWhite(0, alpha:0.3).CGColor,
-      UIColor.clearColor.CGColor
-    ]
-
-    next_container.layer.addSublayer(gradient)
-
-    return next_container
-  end
-
-  def buildNextButton(title)
-    button = KKButton.alloc.init
-    button.frame = [[0, 0], [280, 50]]
-    button.setTitle(title, forState: UIControlStateNormal)
-    return button
-  end
-
-  def buildBlueButton(title)
-    button = KKBlueButton.alloc.init
-    button.frame = [[0, 0], [260, 40]]
-    button.setTitle(title, forState: UIControlStateNormal)
-    return button
   end
 
   def showNextButton
@@ -176,7 +125,7 @@ class WelcomePhotoViewController < UIViewController
     # Save user
     current_user.saveInBackground
 
-    home = HomeViewController.alloc.initWithNibName(nil, bundle: nil)
+    home = KKHomeViewController.alloc.initWithNibName(nil, bundle: nil)
     self.navigationController.pushViewController(home, animated: true)
   end
 
