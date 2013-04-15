@@ -9,7 +9,8 @@ class KKWelcomeViewControllerBase < UIViewController
 
   def viewDidLoad
     super
-    self.applyBackground()
+    # disabled
+    # self.applyBackground()
     self.addStepLabel()
   end
 

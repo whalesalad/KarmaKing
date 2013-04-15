@@ -10,6 +10,10 @@ Motion::Project::App.setup do |app|
   app.version = '1.0'
   app.identifier = 'com.belluba.karmaking'
   app.interface_orientations = [:portrait, :portrait_upside_down]
+  app.device_family = [:iphone]
+  
+  app.icons = %W(Icon.png)
+  app.prerendered_icon = true
 
   app.libs << '/usr/lib/libz.1.1.3.dylib'
   app.libs << '/usr/lib/libsqlite3.dylib'

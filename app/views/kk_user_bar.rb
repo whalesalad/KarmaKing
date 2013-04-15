@@ -9,11 +9,11 @@ class KKUserBar < UIView
 
   def initWithFrame(frame)
     super
+    self.clipsToBounds = false
+
+    self.applyShadow()
     self.applyBackground()
 
-    # Get user photo
-    # resizedImageWithContentMode:UIViewContentModeScaleAspectFit 
-    # interpolationQuality:kCGInterpolationHigh]
     @image_view = UIImageView.alloc.initWithFrame([[15, 15], [50, 50]])
     @image_view.contentMode = UIViewContentModeScaleAspectFit
     @image_view.layer.cornerRadius = 5
@@ -37,7 +37,7 @@ class KKUserBar < UIView
     end)
 
     # Get user name, add as label
-    @user_name = self.upperLabelWithText(self.user.objectForKey("name"), andFrame:[[80, 15], [200, 30]])
+    @user_name = self.upperLabelWithText(self.user.objectForKey("name"), andFrame:[[80, 13], [200, 30]])
     @user_name.font = UIFont.fontWithName("HelveticaNeue-Bold", size:18)
     self.addSubview(@user_name)
 
@@ -47,6 +47,7 @@ class KKUserBar < UIView
     self.addSubview(@user_karma)
 
     # Display settings button
+    # XXX TODO
   end
 
   def upperLabelWithText(text, andFrame:frame)
@@ -70,6 +71,13 @@ class KKUserBar < UIView
       UIColor.colorWithRed(1.000, green:0.502, blue:0.000, alpha:1.000).CGColor
     ]
     self.layer.addSublayer(gradient)
+  end
+
+  def applyShadow
+    layer.shadowOffset = CGSizeMake(0, 2)
+    layer.shadowColor = UIColor.blackColor.CGColor
+    layer.shadowRadius = 5
+    layer.shadowOpacity = 0.5
   end
 
 end
